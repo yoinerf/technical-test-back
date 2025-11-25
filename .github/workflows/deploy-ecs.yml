@@ -1,0 +1,101 @@
+# Workflow de CI/CD para desplegar en AWS ECS
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: investment-funds-api
+  ECS_CLUSTER: investment-funds-cluster
+  ECS_SERVICE: investment-funds-service
+  CONTAINER_NAME: api
+
+jobs:
+  deploy:
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set environment suffix
+        id: env-suffix
+        run: |
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          echo "environment=$ENV" >> $GITHUB_OUTPUT
+          echo "ecr_repository=${{ env.ECR_REPOSITORY }}-$ENV" >> $GITHUB_OUTPUT
+          echo "ecs_cluster=${{ env.ECS_CLUSTER }}-$ENV" >> $GITHUB_OUTPUT
+          echo "ecs_service=${{ env.ECS_SERVICE }}-$ENV" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ steps.env-suffix.outputs.ecr_repository }}:$IMAGE_TAG \
+            -t $ECR_REGISTRY/${{ steps.env-suffix.outputs.ecr_repository }}:latest \
+            -f dockerfile .
+
+      - name: Push Docker image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker push $ECR_REGISTRY/${{ steps.env-suffix.outputs.ecr_repository }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ steps.env-suffix.outputs.ecr_repository }}:latest
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster ${{ steps.env-suffix.outputs.ecs_cluster }} \
+            --service ${{ steps.env-suffix.outputs.ecs_service }} \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for deployment to complete
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ steps.env-suffix.outputs.ecs_cluster }} \
+            --services ${{ steps.env-suffix.outputs.ecs_service }} \
+            --region ${{ env.AWS_REGION }}
+          
+          echo "✅ Deployment completed successfully!"
+
+      - name: Get deployment info
+        run: |
+          # Obtener URL del ALB
+          ALB_DNS=$(aws elbv2 describe-load-balancers \
+            --query "LoadBalancers[?contains(LoadBalancerName, 'investment-funds-alb-${{ steps.env-suffix.outputs.environment }}')].DNSName" \
+            --output text \
+            --region ${{ env.AWS_REGION }})
+          
+          echo "🚀 API deployed at: http://$ALB_DNS"
+          echo "📊 Check status: http://$ALB_DNS/health"

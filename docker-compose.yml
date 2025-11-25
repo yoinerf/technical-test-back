@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: investment-funds-api
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - AWS__DynamoDB__ServiceURL=http://dynamodb-local:8000
+      - AWS__Region=us-east-1
+      - Jwt__SecretKey=test-secret-key-minimum-32-characters-long
+      - Jwt__Issuer=investment-funds-api
+      - Jwt__Audience=investment-funds-client
+    depends_on:
+      - dynamodb-local
