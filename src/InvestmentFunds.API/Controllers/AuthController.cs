@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
     [HttpGet("checkStatus")]
     public async Task<IActionResult> CheckStatus()
     {
-        return Ok("OK - Version 1.0.5");
+        return Ok("OK - Version 1.0.6");
     }
 
     [HttpPost("register")]
