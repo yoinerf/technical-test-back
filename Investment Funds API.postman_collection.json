@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "5585b3f5-8e1c-40e9-a094-d9e8b21f004e",
 		"name": "Investment Funds API",
-		"description": "API para gestión de fondos de inversión - .NET 9 en AWS ECS Fargate",
+		"description": "API para gestión de fondos de inversión - .NET 9 en AWS",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "21334352"
 	},
@@ -12,28 +12,6 @@
 			"item": [
 				{
 					"name": "Register",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Save tokens\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.collectionVariables.set(\"access_token\", jsonData.accessToken);",
-									"    pm.collectionVariables.set(\"refresh_token\", jsonData.refreshToken);",
-									"    pm.collectionVariables.set(\"customer_id\", jsonData.customerId);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -63,28 +41,6 @@
 				},
 				{
 					"name": "Login",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Save tokens\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.collectionVariables.set(\"access_token\", jsonData.accessToken);",
-									"    pm.collectionVariables.set(\"refresh_token\", jsonData.refreshToken);",
-									"    pm.collectionVariables.set(\"customer_id\", jsonData.customerId);",
-									"});"
-								],
-								"type": "text/javascript",
-								"packages": {},
-								"requests": {}
-							}
-						}
-					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -419,49 +375,13 @@
 			"response": []
 		}
 	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"requests": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://your-alb-dns-here.us-east-1.elb.amazonaws.com"
-		},
-		{
-			"key": "customer_id",
-			"value": ""
-		},
-		{
-			"key": "Bearer",
-			"value": ""
+			"value": "https://d3j5dokywqwu74.cloudfront.net"
 		},
 		{
 			"key": "access_token",
-			"value": ""
-		},
-		{
-			"key": "refresh_token",
 			"value": ""
 		}
 	]

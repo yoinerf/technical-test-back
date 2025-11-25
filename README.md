@@ -21,12 +21,22 @@ https://d3j5dokywqwu74.cloudfront.net/health
 3. Ver historial de transacciones (aperturas y cancelaciones).
 4. Enviar notificacio n por email o SMS segu n preferencia del usuario al suscribirse a un fondo.
 
-## 🚀 Tecnologías
+## 🚀 Tecnologías usadas
 
 - .NET 9 SDK
-- Docker Desktop (para desarrollo local)
-- AWS CLI (para despliegue en AWS)
-- Terraform ≥ 1.0 (para despliegue en AWS)
+- Docker Desktop (desarrollo local)
+- AWS CLI (Configuración en AWS)
+- Terraform ≥ 1.0 (Configuración infraestructura y despliegue en AWS)
+- Postman (pruebas)
+- Git (control de versiones)
+- GitHub Actions (despliegue en AWS)
+- AWS S3 (almacenamiento de archivos)
+- AWS CloudFront (distribución de contenido)
+- AWS DynamoDB (base de datos)
+- AWS SES (envío de correos electrónicos)
+- AWS SNS (envío de SMS)
+- AWS IAM (gestión de identidad y acceso)
+
 
 ### Enpoints principales 
 
@@ -85,10 +95,9 @@ Content-Type: application/json
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "customerId": "CUST-123456",
+  "customerId": "373c867b-9bb6-4ab5-a0e7-9cc464227cfc",
   "email": "juan.perez@example.com",
-  "expiresAt": "2024-11-25T23:15:00Z"
+  "expiresAt": "2025-11-25T23:15:00Z"
 }
 ```
 
@@ -117,10 +126,9 @@ POST /api/auth/login
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refreshToken": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "customerId": "CUST-123456",
+  "customerId": "373c867b-9bb6-4ab5-a0e7-9cc464227cfc",
   "email": "juan.perez@example.com",
-  "expiresAt": "2024-11-25T23:15:00Z"
+  "expiresAt": "2025-11-25T23:15:00Z"
 }
 ```
 
@@ -128,6 +136,12 @@ POST /api/auth/login
 - `401 Unauthorized` - Credenciales incorrectas
 
 ---
+
+## Clonar repositorio
+
+```powershell
+git clone https://github.com/yoinerf/technical-test-back.git
+```
 
 ## Desplegar en AWS
 ### 1. Desplegar Infraestructura
